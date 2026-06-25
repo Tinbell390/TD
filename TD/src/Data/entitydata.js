@@ -16,7 +16,8 @@ const EntityType={
         MaxAmmo:0,
         Range:3,
         Score:5000,
-        searchmode:"NearTarget"
+        searchmode:"NearTarget",
+        playable:false
     },
     H:{
         name:"飛行場",
@@ -35,7 +36,8 @@ const EntityType={
         MaxAmmo:0,
         Range:0,
         Score:2000,
-        searchmode:"NearTarget"
+        searchmode:"NearTarget",
+        playable:false
     },
     B:{
         name:"前線基地",
@@ -54,7 +56,8 @@ const EntityType={
         MaxAmmo:0,
         Range:2,
         Score:2000,
-        searchmode:"NearTarget"
+        searchmode:"NearTarget",
+        playable:false
     },
     BRC:{
         name:"バリケード",
@@ -73,7 +76,8 @@ const EntityType={
         MaxAmmo:0,
         Range:2,
         Score:2000,
-        searchmode:"NearTarget"
+        searchmode:"NearTarget",
+        playable:true
     },
     TRT:{
         name:"タレット",
@@ -92,7 +96,8 @@ const EntityType={
         MaxAmmo:0,
         Range:3,
         Score:2000,
-        searchmode:"NearTarget"
+        searchmode:"NearTarget",
+        playable:true
     },
     SMG:{
         name:"サブマシンガン",
@@ -112,7 +117,8 @@ const EntityType={
         Range:3,
         Score:100,
         searchmode:"NearTarget",
-        attackmode:"Shot"
+        attackmode:"Shot",
+        playable:true
     },
     AR:{
         name:"アサルトライフル",
@@ -132,7 +138,8 @@ const EntityType={
         Range:4,
         Score:100,
         searchmode:"NearTarget",
-        attackmode:"Shot"
+        attackmode:"Shot",
+        playable:true
     },
     RF:{
         name:"ライフル",
@@ -152,7 +159,8 @@ const EntityType={
         Range:8,
         Score:100,
         searchmode:"FarTarget",
-        attackmode:"Shot"
+        attackmode:"Shot",
+        playable:true
     },
     SW:{
         name:"ソード",
@@ -172,7 +180,8 @@ const EntityType={
         Range:1,
         Score:100,
         searchmode:"NearTarget",
-        attackmode:"Slash"
+        attackmode:"Slash",
+        playable:true
     },
     DB:{
         name:"デバッグ",
@@ -192,6 +201,7 @@ const EntityType={
         Range:4,
         Score:100,
         searchmode:"NearTarget",
-        attackmode:"Shot"
+        attackmode:"Shot",
+        playable:false
     }
 }
