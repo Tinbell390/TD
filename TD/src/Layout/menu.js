@@ -28,7 +28,15 @@ const Menu={
     forcas(grid_x,grid_y,faction,name){
         this.summonmenu.innerHTML="";
         //生成可能なアイテムのリストを表示
+        //そのマスに建物があるか確認
+        if(faction=="our"){
+            EntityType.forEach(e=>{
+                //プレイアブルであれば表示
+                if(e.playable){
 
+                }
+            })
+        }
     }
 
 }
