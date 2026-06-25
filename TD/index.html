@@ -1,0 +1,34 @@
+<html lang="jp">
+    <head>
+        <meta charset="UTF-8">
+        <title>test TD</title>
+        <link rel="stylesheet" href="./src/Layout/layout.css">
+
+    </head>
+    <body>
+        <div id="stage">
+            <canvas id="Square_Layer" width="1800" height="600" ></canvas>
+            <canvas id="Grid_Layer" width="1800" height="600" ></canvas>
+            <canvas id="Entity_Layer" width="1800" height="600"  style="z-index: 100;"></canvas>
+        </div>
+        <div id="menu">
+            <div id="Scoreboard" >
+                <div id="showtime">00:00:00</div>
+                <div id="showscore">score:0</div>
+                <div id="showcost">cost:0</div>
+            </div>
+            <div id="summonmenu"></div>
+        </div>
+        <script src="src/Data/Map/testmap.js"></script>
+        <script src="src/Data/entitydata.js"></script>
+        <script src="src/System/PathfindingSystem.js"></script>
+        <script src="src/System/BattleSystem.js"></script>
+        <script src="src/System/ScoreSystem.js"></script>
+        <script src="src/System/AI.js"></script>
+        <script src="src/Entity/entity.js"></script>
+        <script src="src/Layout/layout.js"></script>
+        <script src="src/Layout/menu.js"></script>
+
+        <script src="src/Core/main.js"></script>
+    </body>
+</html>

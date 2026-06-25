@@ -1,0 +1,13 @@
+
+
+Entity
+mark:攻撃対象
+内部モード
+idle:待機状態
+    target():攻撃対象を捜索し、攻撃対象をmarkしてattackに移行
+    search():宛先を捜索し、次の移動マス(next)を決定してmoveに移行
+
+move[next]:移動状態
+    nextに移動
+attack[mark]:攻撃状態
+    markに攻撃

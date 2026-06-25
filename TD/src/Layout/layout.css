@@ -1,0 +1,72 @@
+html,body{
+    margin: 0;
+    text-align: center;
+}
+
+canvas{
+    width: 1800px;
+    height: 600px; 
+}
+
+#stage{
+    position: relative; /* 子要素の基準 */
+    width: 1800px;
+    height: 600px;
+    background-color: aliceblue;
+    margin: 10px auto 0 auto;
+}
+#stage canvas{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1800px;
+    height: 600px;
+}
+
+#menu{
+    width: 1800px;
+    height: 200px;
+    background-color: blueviolet;
+    margin: 0 auto;
+}
+#Scoreboard {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 100%;
+}
+
+.bullet{
+    position: absolute;
+    width:4px;
+    height: 4px;
+    background-color: yellow;
+    border-radius: 50%;
+}
+.bullet.move {
+    transition: transform 0.1s linear;
+}
+
+.slash{
+    position:absolute;
+    width:48px;
+    height:6px;
+
+    background:white;
+    border-radius:999px;
+
+    pointer-events:none;
+
+    animation:slashEffect 0.1s linear forwards;
+}
+
+@keyframes slashEffect{
+    from{
+        opacity:1;
+        transform:translate(-50%,-50%) scaleX(0);
+    }
+    to{
+        opacity:0;
+        transform:translate(-50%,-50%) scaleX(1.5);
+    }
+}
