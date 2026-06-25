@@ -29,11 +29,19 @@ const Menu={
         this.summonmenu.innerHTML="";
         //生成可能なアイテムのリストを表示
         //そのマスに建物があるか確認
+        let buildingflag=false;
+        let stgegrid=StageGridList[grid_y][gird_x];
+        stagegrid.onEntity.forEach(e=>{
+            if(e.Category=="building")buidingflag=true;
+        })
         if(faction=="our"){
             EntityType.forEach(e=>{
                 //プレイアブルであれば表示
                 if(e.playable){
-
+                    //建物カテゴリで既に建物があれば表示しない
+                    if(e.Category=="building"&&!buildingflag)return;
+                    //表示用のDOMを生成してsummonmenuに加える
+                    
                 }
             })
         }
