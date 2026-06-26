@@ -55,9 +55,9 @@ const BattleSystem={
     Damage(bullets,this_){
         //0.85~1.15のゆらぎ
         let damage=bullets.A_Attack*(0.85 + Math.random() * 0.30);
-        if(bullets.Critical/100>Math.random()){
+        if(bullets.A_Critical/100>Math.random()){
             console.log("Critical");
-            damage=damage*bullets.CriticalDMG;
+            damage=damage*bullets.A_CriticalDMG/100;
         }
         if(this_.Category=="building"&&bullets.BAflag){
             damage*=3;
