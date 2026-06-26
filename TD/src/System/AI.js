@@ -82,7 +82,7 @@ const EntityAI={
                     if(this.target){
 
                         //待機時間を与える
-                        this.wait=(this.A_FireRate/this.A_Speed)*10;
+                        this.wait=Math.floor(60/this.A_Speed);
                         return ;
                     }
                 }
@@ -144,12 +144,14 @@ const EntityAI={
                     }
                 }
                 //残弾計算
-                this.CurrentAmmo--;
-                //残弾が0ならリロード
-                if(this.CurrentAmmo<=0){
-                    this.CurrentAmmo=this.MaxAmmo;
-                    this.wait=BattleSystem.ReloadWait(this.MaxAmmo);
-                    console.log(this.faction,"onreloaded")
+                if(this.MaxAmmo!=null){
+                    this.CurrentAmmo--;
+                    //残弾が0ならリロード
+                    if(this.CurrentAmmo<=0){
+                        this.CurrentAmmo=this.MaxAmmo;
+                        this.wait=BattleSystem.ReloadWait(this.MaxAmmo);
+                        console.log(this.faction,"onReloaded")
+                    }
                 }
 
             }
@@ -328,7 +330,7 @@ const EntityAI={
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
                         bulletss.classList.add("move");
-                        bulletss.style.transform =`translate(${ta.x}px, ${ta.y}px)`;
+                        bulletss.style.transform =`translate(${ta.x+Math.floor(Math.random() * 11) - 5}px, ${ta.y+Math.floor(Math.random() * 11) - 5}px)`;
                     });
                 });
 
