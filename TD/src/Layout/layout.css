@@ -51,10 +51,8 @@ canvas{
     position:absolute;
     width:48px;
     height:6px;
-
     background:white;
     border-radius:999px;
-
     pointer-events:none;
 
     animation:slashEffect 0.1s linear forwards;
@@ -63,10 +61,16 @@ canvas{
 @keyframes slashEffect{
     from{
         opacity:1;
-        transform:translate(-50%,-50%) scaleX(0);
+        transform:
+            translate(-50%,-50%)
+            rotate(var(--angle))
+            scaleX(0);
     }
     to{
         opacity:0;
-        transform:translate(-50%,-50%) scaleX(1.5);
+        transform:
+            translate(-50%,-50%)
+            rotate(var(--angle))
+            scaleX(1.5);
     }
 }

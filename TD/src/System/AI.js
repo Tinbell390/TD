@@ -252,11 +252,11 @@ const EntityAI={
 
             slash.style.left = `${cx}px`;
             slash.style.top = `${cy}px`;
-            slash.style.transform = `translate(-50%,-50%) rotate(${angle}deg)`;
+            slash.style.setProperty("--angle", `${angle}deg`);
 
             setTimeout(()=>{
                 slash.remove();
-            },100); // 約3フレーム
+            },(1000/fps)*attacklog.slashwait); // 約3フレーム
         }
     },
     Undiscoveredwait:20     //経路探査失敗時の待機時間
