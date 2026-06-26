@@ -47,6 +47,11 @@ function gameloop(){
             EntityList.splice(i,1);
         }
     }
+    StageGridList.forEach(g1=>{
+        g1.forEach(g2=>{
+            g2.onEntity=g2.onEntity.filter(e=>!e.deathflag)
+        })
+    })
     ScoreSystem.CheckScore();
     if(gametime%(fps*5)==0) {
         ScoreSystem.Cooperate();
@@ -65,12 +70,13 @@ document.addEventListener("keydown", (e) => {
 setInterval(gameloop, 1000/fps);
 //エンティティテスト用
 
+// new Entity(22,7,"SG","our","Suppress");
 new Entity(22,7,"SG","our","Suppress");
-// new Entity(22,7,"RF","our","Suppress");
-new Entity(22,7,"SMG","our","Suppress");
-new Entity(22,7,"HMG","our","Suppress");
+new Entity(20,7,"RF","our","Suppress");
+// new Entity(20,7,"AR","our","Suppress");
 
-// new Entity(37,7,"LMG","enemy1","Suppress");
-new Entity(37,7,"AR","enemy1","Suppress");
-new Entity(37,7,"AR","enemy1","Suppress");
-new Entity(37,7,"AR","enemy1","Suppress");
+new Entity(37,7,"SMG","enemy1","Suppress");
+// new Entity(37,7,"SMG","enemy1","Suppress");
+// new Entity(37,7,"SW","enemy1","Suppress");
+// new Entity(37,7,"SW","enemy1","Suppress");
+// new Entity(37,7,"SW","enemy1","Suppress");

@@ -16,11 +16,9 @@ class Entity{
         const t=EntityType[type];
         //EntityTypeから継承
         Object.assign(this, EntityType[type]);
-        console.log(this.Score)
 
         this.grid_x=grid_x;
         this.grid_y=grid_y;
-
         this.x=(grid_x+0.5)*stage_grid_size;
         this.y=(grid_y+0.5)*stage_grid_size;
 
@@ -98,6 +96,8 @@ class Entity{
 
         //制御配列に入れる
         StageGridList[this.grid_y][this.grid_x].onEntity.push(this);
+        console.log(EntityList)
+        console.log(this)
         EntityList.push(this);
 
         //HQなら射程内の通路を勢力下におく
@@ -221,6 +221,7 @@ class Entity{
         //DOMを消去
         this.node.remove();
 
+        console.log(StageGridList[this.grid_y][this.grid_x].onEntity.filter(e=>e==this))
         //所在マスのonEntityから自分を削除
         StageGridList[this.grid_y][this.grid_x].onEntity=StageGridList[this.grid_y][this.grid_x].onEntity.filter(e=>e!=this);
 

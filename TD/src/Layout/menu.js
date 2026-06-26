@@ -25,23 +25,28 @@ const Menu={
         Menu.showscore.innerHTML=ScoreSystem.GameScore;
         Menu.showcost.innerHTML=ScoreSystem.GameCost;
     },
-    forcas(grid_x,grid_y,faction,name){
+    forcas(grid){
+        console.log(grid.x,grid.y)
         this.summonmenu.innerHTML="";
         //生成可能なアイテムのリストを表示
         //そのマスに建物があるか確認
-        let buildingflag=false;
-        let stgegrid=StageGridList[grid_y][gird_x];
-        stagegrid.onEntity.forEach(e=>{
-            if(e.Category=="building")buidingflag=true;
-        })
-        if(faction=="our"){
-            EntityType.forEach(e=>{
+        let buildingflag=grid.onEntity.some(e=>e.Category=="building");
+
+        if(grid.faction=="our"){
+            Object.values(EntityType).forEach(e=>{
                 //プレイアブルであれば表示
                 if(e.playable){
                     //建物カテゴリで既に建物があれば表示しない
-                    if(e.Category=="building"&&!buildingflag)return;
+                    if(e.Category=="building"&&buildingflag)return;
                     //表示用のDOMを生成してsummonmenuに加える
-                    
+                    const p=document.createElement("div");
+                    p.innerHTML=`${e.name}:cost${e.cost}`;
+                    const input=document.createElement("input");
+                    input.type="button";
+                    input.value="Summon";
+                    input.onclick=()=>{new Entity(grid.x,grid.y,e.label,'our','Suppress')}
+                    p.appendChild(input);
+                    this.summonmenu.appendChild(p);
                 }
             })
         }

@@ -85,11 +85,43 @@ const BattleSystem={
         });
     },
     //ノックバック処理
-    Knockback(){
+    Knockback(this_,target){
+        //建物はノックバックしない
+        if(target.Category == "building") return;
 
+        
+
+        const dx = target.grid_x - this_.grid_x;
+        const dy = target.grid_y - this_.grid_y;
+        const correction={x:dx>dy?dx/Math.abs(dx):0,y:dx>dy?0:dy/Math.abs(dy)};
+
+        //ノックバック先が通行不可ならノックバックしない
+        // if(!StageGridList[target.grid_y+correction.y][target.grid_x+correction.x].path)return;
+
+        if(!StageGridList[target.grid_y][target.grid_x].pass)return;
+        //ターゲットのマス情報を更新
+        StageGridList[target.grid_y][target.grid_x].onEntity =StageGridList[target.grid_y][target.grid_x].onEntity.filter(e => e !== target);
+
+        //ターゲットの位置情報を変更
+        [target.grid_x,target.grid_y]=[target.grid_x+correction.x,target.grid_y+correction.y];
+        target.x=(target.grid_x+0.5)*stage_grid_size;
+        target.y=(target.grid_y+0.5)*stage_grid_size;
+
+        //ターゲットのDOMの位置情報を変更
+        target.node.style.left=this.x+"px";
+        target.node.style.top=this.y+"px";
+
+        //ターゲットをノックバック先のマスに入れる
+        StageGridList[target.grid_y][target.grid_x].onEntity.push(target);
+
+        //ターゲットのルートと宛先を初期化する
+        target.dest=null;
+        target.route=null;
+        target.mode="idle";
+        
     },
     
     BuildingDamage:3,
-    KnockbackChance:5,
+    KnockbackChance:100,
     ScatterTarget:3
 }

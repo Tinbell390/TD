@@ -80,9 +80,9 @@ const EntityAI={
 
                     //ターゲットが見つかれば終了
                     if(this.target){
-
+                        console.log(this.target,this.target.deathflag)
                         //待機時間を与える
-                        this.wait=Math.floor(60/this.A_Speed);
+                        this.wait=(this.A_FireRate/this.A_Speed)*10;
                         return ;
                     }
                 }
@@ -91,7 +91,7 @@ const EntityAI={
                 if(!this.route){
                     //経路がなければ経路探査
                     [this.dest,this.route]=PathfindSystem.Astar({x:this.grid_x,y:this.grid_y},factionList[this.faction].SuppressionTarget);
-                    console.log(this.route)
+                    // console.log(this.route)
 
                     if(!this.route){
                         //探査しても経路が見つからなければ20f待機
@@ -113,47 +113,21 @@ const EntityAI={
             //攻撃モードの処理
             else if(this.mode=="attack"){
                 //相手が死亡していれば待機モードに移行
-                if(!Array.isArray(this.target)){
-                    if(this.target.deathflag){
-                        this.target=null;
-                        this.mode="idle";
-                    }
-                    //相手とのマンハッタン距離が射程より大きければターゲットをクリアして待機モードへ
-                    else if(Math.abs(this.grid_x-this.target.grid_x)+Math.abs(this.grid_y-this.target.grid_y)>this.Range){
-                        this.target=null;
-                        this.mode="idle";
-                    }
-                    //そうでなければ攻撃
-                    else{
-                        this.attackaction(this);
-                        this.wait=BattleSystem.ShotWait(this.A_FireRate)
-                    }
+                if(this.target.deathflag){
+                    this.target=null;
+                    this.mode="idle";
                 }
+                //相手とのマンハッタン距離が射程より大きければターゲットをクリアして待機モードへ
+                else if(Math.abs(this.grid_x-this.target.grid_x)+Math.abs(this.grid_y-this.target.grid_y)>this.Range){
+                    this.target=null;
+                    this.mode="idle";
+                }
+                //そうでなければ攻撃
                 else{
-                    if(this.target.some(target => target.deathflag)){
-                        this.target=null;
-                        this.mode="idle";
-                    }
-                    else if(this.target.some(target=>Math.abs(this.grid_x-target.grid_x)+Math.abs(this.grid_y-target.grid_y)>this.Range)){
-                        this.target=null;
-                        this.mode="idle";
-                    }
-                    else{
-                        this.attackaction(this);
-                        this.wait=BattleSystem.ShotWait(this.A_FireRate)
-                    }
+                    this.attackaction(this);
+                    this.wait=BattleSystem.ShotWait(this.A_FireRate)
                 }
-                //残弾計算
-                if(this.MaxAmmo!=null){
-                    this.CurrentAmmo--;
-                    //残弾が0ならリロード
-                    if(this.CurrentAmmo<=0){
-                        this.CurrentAmmo=this.MaxAmmo;
-                        this.wait=BattleSystem.ReloadWait(this.MaxAmmo);
-                        console.log(this.faction,"onReloaded")
-                    }
-                }
-
+                return;
             }
             else if(this.mode=="move"){
                 this.move();
@@ -211,7 +185,7 @@ const EntityAI={
                     enemylist =enemylist.filter(entity =>entity.faction!=this.faction);
 
                     enemylist.forEach(e=>{
-                        if(ta.length>=BattleSystem.ScatterTarget)return;
+                        if(ta.length>BattleSystem.ScatterTarget)return;
                         ta.push(e);
                     })
 
@@ -325,15 +299,20 @@ const EntityAI={
                 stage.appendChild(bulletss);
 
                 bulletss.style.transform = `translate(${this_.x}px, ${this_.y}px)`;
+                
+
 
                 // 初期描画後に移動開始
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
                         bulletss.classList.add("move");
-                        bulletss.style.transform =`translate(${ta.x+Math.floor(Math.random() * 11) - 5}px, ${ta.y+Math.floor(Math.random() * 11) - 5}px)`;
+                        bulletss.style.transform =`translate(${ta.x}px, ${ta.y}px)`;
                     });
                 });
-
+                //ノックバック判定と処理
+                if(BattleSystem.KnockbackChance/100>Math.random()){
+                    BattleSystem.Knockback(this_,ta);
+                }
                 // 到達したら削除
                 bulletss.addEventListener("transitionend", () => {
                     bulletss.remove();

@@ -243,6 +243,7 @@ function selectGrid(x, y){
     }
 
     const grid = StageGridList[y][x];
+    Menu.forcas(grid);
 
     //scopegridへ格納
     scopegrid.x = grid.x;
@@ -254,7 +255,6 @@ function selectGrid(x, y){
     scopegrid.onEntity = grid.onEntity;
 
     selectedGrid = grid;
-    console.log(scopegrid)
     drawSelectedGrid();
 }
 
