@@ -26,11 +26,12 @@ const Menu={
         Menu.showcost.innerHTML=ScoreSystem.GameCost;
     },
     forcas(grid){
-        console.log(grid.x,grid.y)
         this.summonmenu.innerHTML="";
         //生成可能なアイテムのリストを表示
         //そのマスに建物があるか確認
         let buildingflag=grid.onEntity.some(e=>e.Category=="building");
+        let infantryflag=!(grid.name=="司令部"||grid.name=="飛行場");
+        console.log(grid.name);
 
         if(grid.faction=="our"){
             Object.values(EntityType).forEach(e=>{
@@ -38,6 +39,8 @@ const Menu={
                 if(e.playable){
                     //建物カテゴリで既に建物があれば表示しない
                     if(e.Category=="building"&&buildingflag)return;
+                    //兵士カテゴリで司令部か飛行場でなければ表示しない
+                    if(e.Category=="infantry"&&infantryflag)return;
                     //表示用のDOMを生成してsummonmenuに加える
                     const p=document.createElement("div");
                     p.innerHTML=`${e.name}:cost${e.cost}`;

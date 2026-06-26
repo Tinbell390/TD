@@ -100,6 +100,7 @@ class Grid{//マス情報
         this.x=x;
         this.y=y;
         this.mode=mode;
+        this.name=grid_mode_List[mode].name;
         this.faction=grid_mode_List[mode].faction;
         this.pass=grid_mode_List[mode].pass;
         this.through=grid_mode_List[mode].through;

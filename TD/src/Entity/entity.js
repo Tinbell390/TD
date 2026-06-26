@@ -213,7 +213,6 @@ class Entity{
         //スコア加算
         if(this.faction!="our"){
             ScoreSystem.addScore(this.Score);
-            console.log(this.Score)
         }
         //死亡フラグを真に
         this.deathflag=true;
@@ -221,7 +220,6 @@ class Entity{
         //DOMを消去
         this.node.remove();
 
-        console.log(StageGridList[this.grid_y][this.grid_x].onEntity.filter(e=>e==this))
         //所在マスのonEntityから自分を削除
         StageGridList[this.grid_y][this.grid_x].onEntity=StageGridList[this.grid_y][this.grid_x].onEntity.filter(e=>e!=this);
 
