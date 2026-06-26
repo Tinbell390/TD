@@ -79,5 +79,13 @@ const BattleSystem={
         this_.buffList.forEach(buffs => {
             this_[`A_${buffs.state}`]*=(1+buffs.rate/100);
         });
-    }
+    },
+    //ノックバック処理
+    Knockback(){
+
+    },
+    
+    BuildingDamage:3,
+    KnockbackChance:5,
+    ScatterTarget:3
 }

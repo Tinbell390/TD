@@ -65,6 +65,7 @@ document.addEventListener("keydown", (e) => {
 setInterval(gameloop, 1000/fps);
 //エンティティテスト用
 
-new Entity(22,7,"SW","our","Suppress");
-new Entity(22,7,"AR","our","Suppress");
+new Entity(22,7,"SG","our","Suppress");
+// new Entity(22,7,"AR","our","Suppress");
 new Entity(37,7,"SMG","enemy1","Suppress");
+new Entity(37,7,"AR","enemy1","Suppress");

@@ -167,6 +167,34 @@ const EntityAI={
 
             return null;
         },
+        //散弾で最も近い敵3体を標的にする
+        ScatterTarget(){
+            let ta=[];
+            for(let i=1;i<=this.Range;i++){
+               
+
+                for(let d of DEST[i]){
+                    let nx=this.grid_x+d.x;
+                    let ny=this.grid_y+d.y;
+                    if(nx < 0 ||ny < 0 ||ny >= StageGridList.length ||nx >= StageGridList[0].length){
+                        continue;
+                    }
+
+                    let enemylist =StageGridList[ny][nx].onEntity;
+
+                    enemylist =enemylist.filter(entity =>entity.faction!=this.faction);
+
+                    enemylist.forEach(e=>{
+                        if(ta.length>BattleSystem.ScatterTarget)return;
+                        ta.push(e);
+                    })
+
+                }
+
+            }
+            if(ta.length==0)return null;
+            else return ta;
+        },
         //最も遠い敵をターゲット
         FarTarget(){
 
@@ -197,7 +225,7 @@ const EntityAI={
         }
     },
     Attack:{
-        Shot(this_){
+        Shot(this_){//通常射撃
             //攻撃予約を標的のhitListに入れる
             let b=new attacklog(this_.A_Attack,this_.A_Penetrat,this_.A_Accuracy,this_.faction,attacklog.shotwait,false)
             this_.target.hitList.push(b);
@@ -224,7 +252,7 @@ const EntityAI={
                 bulletss.remove();
             }, { once: true });
         },
-        Slash(this_){
+        Slash(this_){//近接斬撃
 
             let b = new attacklog(
                 this_.A_Attack,
@@ -257,6 +285,35 @@ const EntityAI={
             setTimeout(()=>{
                 slash.remove();
             },(1000/fps)*attacklog.slashwait); // 約3フレーム
+        },
+        Scatter(this_){//散弾
+            //
+            let targets=this_.target;//配列
+            targets.forEach(ta=>{
+                //攻撃予約を標的のhitListに入れる
+                let b=new attacklog(this_.A_Attack,this_.A_Penetrat,this_.A_Accuracy,this_.faction,attacklog.shotwait,false)
+                ta.hitList.push(b);
+                //(thia.x,this.y)から(this.target.x,this.target.y)まで3フレーム(fps=30)で到達する描画
+                const bulletss = document.createElement("div");
+                bulletss.className = "bullet";
+                stage.appendChild(bulletss);
+
+                bulletss.style.transform = `translate(${this_.x}px, ${this_.y}px)`;
+
+                // 初期描画後に移動開始
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        bulletss.classList.add("move");
+                        bulletss.style.transform =`translate(${ta.x}px, ${ta.target.y}px)`;
+                    });
+                });
+
+                // 到達したら削除
+                bulletss.addEventListener("transitionend", () => {
+                    bulletss.remove();
+                }, { once: true });
+            })
+
         }
     },
     Undiscoveredwait:20     //経路探査失敗時の待機時間

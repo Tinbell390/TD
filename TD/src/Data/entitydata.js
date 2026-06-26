@@ -162,6 +162,27 @@ const EntityType={
         attackmode:"Shot",
         playable:true
     },
+    SG:{
+        name:"ショットガン",
+        label:"SG",
+        Category:"infantry",
+        MaxHp:600,
+        B_Attack:30,
+        B_Accuracy:100,
+        B_Dodge:10,
+        B_FireRate:30,
+        B_Armor:40,
+        B_Penetrat:0,
+        B_Speed:18,
+        B_Critical:40,
+        B_CriticalDMG:150,
+        MaxAmmo:10,
+        Range:3,
+        Score:100,
+        searchmode:"ScatterTarget",
+        attackmode:"Scatter",
+        playable:true
+    },
     SW:{
         name:"ソード",
         label:"SW",
