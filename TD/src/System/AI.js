@@ -1,12 +1,71 @@
 const EntityAI={
     Action:{
-        Building(){
+        Building(){//建物モード
+            //何もしない
+        },
+        Turret(){//タレットモード
+            //待機時間があればデクリメントして返す
+            if(this.wait>0){
+                this.wait--;
+                return ;
+            }
+
+            //待機状態の処理
+            else if(this.mode=="idle"){
+                if(this.target){
+                    // ターゲットが存在するなら攻撃状態に移行
+                    this.mode="attack";
+                    return;
+                }
+                else {
+                    //ターゲットが存在しないなら標的を探す
+                    this.target=this.search.call(this);
+
+                    //ターゲットが見つかれば終了
+                    if(this.target){
+                        //待機時間を与える
+                        this.wait=(this.A_FireRate/this.A_Speed)*5;
+                    }
+                    //ターゲットが見つからなければ射撃間隔だけ待機
+                    else{
+                        this.wait=BattleSystem.ShotWait(this.A_FireRate);
+                    }
+                }
+            }
+
+            //攻撃モードの処理
+            else if(this.mode=="attack"){
+                //相手が死亡していれば待機モードに移行
+                if(this.target.deathflag){
+                    this.target=null;
+                    this.mode="idle";
+                }
+                //相手とのマンハッタン距離が射程より大きいならターゲットをクリアして待機モードへ
+                else if(Math.abs(this.grid_x-this.target.grid_x)+Math.abs(this.grid_y-this.target.grid_y)>this.Range){
+                    this.target=null;
+                    this.mode="idle";
+                }
+                //そうでなければ攻撃
+                else{
+                    this.attackaction(this);
+                    this.wait=BattleSystem.ShotWait(this.A_FireRate)
+                }
+                return;
+            }
+        },
+        Assault(){//突撃モード
+            //待機時間があればデクリメントして返す
+            if(this.wait>0){
+                this.wait--;
+                return;
+            }
 
         },
         Suppress(){//制圧モード
             //待機時間があればデクリメントして返す
             if(this.wait>0){
                 this.wait--;
+                return;
             }
             // 待機モードの処理
             else if(this.mode=="idle"){
@@ -35,8 +94,8 @@ const EntityAI={
                     console.log(this.route)
 
                     if(!this.route){
-                        //探査しても経路が見つからなければ10f待機
-                        this.wait=60;
+                        //探査しても経路が見つからなければ20f待機
+                        this.wait=20;
                         return;
                     }
                 }
@@ -58,7 +117,7 @@ const EntityAI={
                     this.target=null;
                     this.mode="idle";
                 }
-                //相手とのマンハッタン距離が射程以下ならターゲットをクリアして待機モードへ
+                //相手とのマンハッタン距離が射程より大きければターゲットをクリアして待機モードへ
                 else if(Math.abs(this.grid_x-this.target.grid_x)+Math.abs(this.grid_y-this.target.grid_y)>this.Range){
                     this.target=null;
                     this.mode="idle";
@@ -199,5 +258,6 @@ const EntityAI={
                 slash.remove();
             },100); // 約3フレーム
         }
-    }
+    },
+    Undiscoveredwait:20     //経路探査失敗時の待機時間
 }
