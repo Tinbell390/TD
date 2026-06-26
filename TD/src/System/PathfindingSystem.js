@@ -192,7 +192,6 @@ const PathfindSystem = {
     },
     clearRoute(grid_x,grid_y){
         //引数を宛先とするすべての兵士ノードの宛先とルートを初期化
-        console.log("clear route:",grid_x,grid_y)
         EntityList.forEach(e=>{
             if(e.dest==null){
                 return;

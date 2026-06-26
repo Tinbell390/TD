@@ -3,10 +3,12 @@
 
 
 class attacklog{
-    constructor(A_Attack,A_Penetrat,A_Accuracy,faction,wait,BAflag){
+    constructor(A_Attack,A_Penetrat,A_Accuracy,A_Critical,A_CriticalDMG,faction,wait,BAflag){
         this.A_Attack=A_Attack;
         this.A_Penetrat=A_Penetrat;
         this.A_Accuracy=A_Accuracy;
+        this.A_Critical=A_Critical;
+        this.A_CriticalDMG=A_CriticalDMG;
         this.faction=faction;
         this.BAflag=BAflag;
         this.wait=wait;
@@ -53,9 +55,9 @@ const BattleSystem={
     Damage(bullets,this_){
         //0.85~1.15のゆらぎ
         let damage=bullets.A_Attack*(0.85 + Math.random() * 0.30);
-        if(this_.Critical/100>Math.random()){
+        if(bullets.Critical/100>Math.random()){
             console.log("Critical");
-            damage=damage*this_.CriticalDMG;
+            damage=damage*bullets.CriticalDMG;
         }
         if(this_.Category=="building"&&bullets.BAflag){
             damage*=3;

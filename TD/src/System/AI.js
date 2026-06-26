@@ -80,7 +80,6 @@ const EntityAI={
 
                     //ターゲットが見つかれば終了
                     if(this.target){
-                        console.log(this.target,this.target.deathflag)
                         //待機時間を与える
                         this.wait=(this.A_FireRate/this.A_Speed)*10;
                         return ;
@@ -249,7 +248,7 @@ const EntityAI={
     Attack:{
         Shot(this_){//通常射撃
             //攻撃予約を標的のhitListに入れる
-            let b=new attacklog(this_.A_Attack,this_.A_Penetrat,this_.A_Accuracy,this_.faction,attacklog.shotwait,false)
+            let b=new attacklog(this_.A_Attack,this_.A_Penetrat,this_.A_Accuracy,this_.A_Critical,this_.A_CriticalDMG,this_.faction,attacklog.shotwait,false)
             this_.target.hitList.push(b);
             //(thia.x,this.y)から(this.target.x,this.target.y)まで3フレーム(fps=30)で到達する描画
             const bulletss = document.createElement("div");
@@ -280,6 +279,7 @@ const EntityAI={
                 this_.A_Attack,
                 this_.A_Penetrat,
                 this_.A_Accuracy,
+                this_.A_Critical,this_.A_CriticalDMG,
                 this_.faction,
                 attacklog.slashwait,
                 true
@@ -313,7 +313,7 @@ const EntityAI={
             let targets=this_.target;//配列
             targets.forEach(ta=>{
                 //攻撃予約を標的のhitListに入れる
-                let b=new attacklog(this_.A_Attack,this_.A_Penetrat,this_.A_Accuracy,this_.faction,attacklog.shotwait,false)
+                let b=new attacklog(this_.A_Attack,this_.A_Penetrat,this_.A_Accuracy,this_.A_Critical,this_.A_CriticalDMG,this_.faction,attacklog.shotwait,false)
                 ta.hitList.push(b);
                 //(thia.x,this.y)から(this.target.x,this.target.y)まで3フレーム(fps=30)で到達する描画
                 const bulletss = document.createElement("div");
