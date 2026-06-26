@@ -68,4 +68,6 @@ setInterval(gameloop, 1000/fps);
 new Entity(22,7,"SG","our","Suppress");
 // new Entity(22,7,"AR","our","Suppress");
 new Entity(37,7,"SMG","enemy1","Suppress");
-new Entity(37,7,"AR","enemy1","Suppress");
+new Entity(37,7,"SMG","enemy1","Suppress");
+new Entity(37,7,"SMG","enemy1","Suppress");
+new Entity(37,7,"SMG","enemy1","Suppress");

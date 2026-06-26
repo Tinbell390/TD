@@ -114,7 +114,7 @@ const EntityType={
         B_Critical:5,
         B_CriticalDMG:150,
         MaxAmmo:10,
-        Range:3,
+        Range:2,
         Score:100,
         searchmode:"NearTarget",
         attackmode:"Shot",

@@ -45,6 +45,10 @@ const BattleSystem={
     ShotWait(A_FireRate){
         return Math.floor(1500/A_FireRate);
     },
+    //リロード時間を返す
+    ReloadWait(MaxAmmo){
+        return Math.floor(MaxAmmo*0.5*fps);
+    },
     //ダメージ計算
     Damage(bullets,this_){
         //0.85~1.15のゆらぎ

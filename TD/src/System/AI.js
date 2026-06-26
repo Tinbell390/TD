@@ -113,21 +113,45 @@ const EntityAI={
             //攻撃モードの処理
             else if(this.mode=="attack"){
                 //相手が死亡していれば待機モードに移行
-                if(this.target.deathflag){
-                    this.target=null;
-                    this.mode="idle";
+                if(!Array.isArray(this.target)){
+                    if(this.target.deathflag){
+                        this.target=null;
+                        this.mode="idle";
+                    }
+                    //相手とのマンハッタン距離が射程より大きければターゲットをクリアして待機モードへ
+                    else if(Math.abs(this.grid_x-this.target.grid_x)+Math.abs(this.grid_y-this.target.grid_y)>this.Range){
+                        this.target=null;
+                        this.mode="idle";
+                    }
+                    //そうでなければ攻撃
+                    else{
+                        this.attackaction(this);
+                        this.wait=BattleSystem.ShotWait(this.A_FireRate)
+                    }
                 }
-                //相手とのマンハッタン距離が射程より大きければターゲットをクリアして待機モードへ
-                else if(Math.abs(this.grid_x-this.target.grid_x)+Math.abs(this.grid_y-this.target.grid_y)>this.Range){
-                    this.target=null;
-                    this.mode="idle";
-                }
-                //そうでなければ攻撃
                 else{
-                    this.attackaction(this);
-                    this.wait=BattleSystem.ShotWait(this.A_FireRate)
+                    if(this.target.some(target => target.deathflag)){
+                        this.target=null;
+                        this.mode="idle";
+                    }
+                    else if(this.target.some(target=>Math.abs(this.grid_x-target.grid_x)+Math.abs(this.grid_y-target.grid_y)>this.Range)){
+                        this.target=null;
+                        this.mode="idle";
+                    }
+                    else{
+                        this.attackaction(this);
+                        this.wait=BattleSystem.ShotWait(this.A_FireRate)
+                    }
                 }
-                return;
+                //残弾計算
+                this.CurrentAmmo--;
+                //残弾が0ならリロード
+                if(this.CurrentAmmo<=0){
+                    this.CurrentAmmo=this.MaxAmmo;
+                    this.wait=BattleSystem.ReloadWait(this.MaxAmmo);
+                    console.log(this.faction,"onreloaded")
+                }
+
             }
             else if(this.mode=="move"){
                 this.move();
@@ -185,7 +209,7 @@ const EntityAI={
                     enemylist =enemylist.filter(entity =>entity.faction!=this.faction);
 
                     enemylist.forEach(e=>{
-                        if(ta.length>BattleSystem.ScatterTarget)return;
+                        if(ta.length>=BattleSystem.ScatterTarget)return;
                         ta.push(e);
                     })
 
@@ -304,7 +328,7 @@ const EntityAI={
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
                         bulletss.classList.add("move");
-                        bulletss.style.transform =`translate(${ta.x}px, ${ta.target.y}px)`;
+                        bulletss.style.transform =`translate(${ta.x}px, ${ta.y}px)`;
                     });
                 });
 

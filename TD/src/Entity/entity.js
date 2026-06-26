@@ -26,6 +26,7 @@ class Entity{
 
         //ステータス
         this.CurrentHp=this.MaxHp;
+        this.CurrentAmmo=this.MaxAmmo;
         this.A_Attack=this.B_Attack;
         this.A_Accuracy=this.B_Accuracy;
         this.A_Dodge=this.B_Dodge
