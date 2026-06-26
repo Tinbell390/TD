@@ -96,8 +96,6 @@ class Entity{
 
         //制御配列に入れる
         StageGridList[this.grid_y][this.grid_x].onEntity.push(this);
-        console.log(EntityList)
-        console.log(this)
         EntityList.push(this);
 
         //HQなら射程内の通路を勢力下におく

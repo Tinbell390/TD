@@ -195,12 +195,9 @@ const PathfindSystem = {
         console.log("clear route:",grid_x,grid_y)
         EntityList.forEach(e=>{
             if(e.dest==null){
-                console.log("dest=null:")
-                console.log(e)
                 return;
             }
             else if(e.dest.x==grid_x&&e.dest.y==grid_y){
-                console.log("clear")
                 e.dest=null;
                 e.route=null;
                 e.mode="idle"
