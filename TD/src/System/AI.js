@@ -112,22 +112,44 @@ const EntityAI={
             }
             //攻撃モードの処理
             else if(this.mode=="attack"){
-                //相手が死亡していれば待機モードに移行
-                if(this.target.deathflag){
-                    this.target=null;
-                    this.mode="idle";
+                //ターゲットが配列である
+                if(!Array.isArray(this.target)){               
+                     //相手が死亡していれば待機モードに移行
+                    if(this.target.deathflag){
+                        this.target=null;
+                        this.mode="idle";
+                    }
+                    //相手とのマンハッタン距離が射程より大きければターゲットをクリアして待機モードへ
+                    else if(Math.abs(this.grid_x-this.target.grid_x)+Math.abs(this.grid_y-this.target.grid_y)>this.Range){
+                        this.target=null;
+                        this.mode="idle";
+                    }
+                    //そうでなければ攻撃
+                    else{
+                        this.attackaction(this);
+                        this.wait=BattleSystem.ShotWait(this.A_FireRate)
+                    }
+                    return;
                 }
-                //相手とのマンハッタン距離が射程より大きければターゲットをクリアして待機モードへ
-                else if(Math.abs(this.grid_x-this.target.grid_x)+Math.abs(this.grid_y-this.target.grid_y)>this.Range){
-                    this.target=null;
-                    this.mode="idle";
+                //ターゲットが配列
+                else{             
+                    //相手が死亡していれば待機モードに移行
+                    if(this.target.some(ta=>ta.deathflag)){
+                        this.target=null;
+                        this.mode="idle";
+                    }
+                    //相手とのマンハッタン距離が射程より大きければターゲットをクリアして待機モードへ
+                    else if(this.target.some(ta=>Math.abs(this.grid_x-ta.grid_x)+Math.abs(this.grid_y-ta.grid_y)>this.Range)){
+                        this.target=null;
+                        this.mode="idle";
+                    }
+                    //そうでなければ攻撃
+                    else{
+                        this.attackaction(this);
+                        this.wait=BattleSystem.ShotWait(this.A_FireRate)
+                    }
+                    return;
                 }
-                //そうでなければ攻撃
-                else{
-                    this.attackaction(this);
-                    this.wait=BattleSystem.ShotWait(this.A_FireRate)
-                }
-                return;
             }
             else if(this.mode=="move"){
                 this.move();
