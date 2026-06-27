@@ -259,3 +259,13 @@ class Entity{
         }
     }
 }
+function summonEntity(grid_x,grid_y,type,faction,actionmode){
+    if(EntityType[type].cost>ScoreSystem.GameCost){
+        console.alert("コストが足りません");
+        return ;
+    }
+    else{
+        ScoreSystem.GameCost-=EntityType[type].cost;
+        new Entity(grid_x,grid_y,type,faction,actionmode);
+    }
+}
