@@ -81,7 +81,7 @@ const EntityAI={
                     //ターゲットが見つかれば終了
                     if(this.target){
                         //待機時間を与える
-                        this.wait=(this.A_FireRate/this.A_Speed)*10;
+                        this.wait=(this.A_FireRate/this.A_Speed);
                         return ;
                     }
                 }
@@ -111,6 +111,10 @@ const EntityAI={
             }
             //攻撃モードの処理
             else if(this.mode=="attack"){
+                if(this.reloadwait>0){
+                    this.reloadwait--;
+                    return ;
+                }
                 //ターゲットが配列である
                 if(!Array.isArray(this.target)){               
                      //相手が死亡していれば待機モードに移行
@@ -123,8 +127,15 @@ const EntityAI={
                         this.target=null;
                         this.mode="idle";
                     }
+                    //残弾が0以下ならリロード
+                    else if(this.CurrentAmmo<=0&&this.MaxAmmo){
+                        this.CurrentAmmo=this.MaxAmmo;
+                        this.reloadwait=BattleSystem.ReloadWait(this.MaxAmmo);
+                        this.mode="idle";
+                    }
                     //そうでなければ攻撃
                     else{
+                        this.CurrentAmmo--;
                         this.attackaction(this);
                         this.wait=BattleSystem.ShotWait(this.A_FireRate)
                     }
@@ -142,8 +153,15 @@ const EntityAI={
                         this.target=null;
                         this.mode="idle";
                     }
+                    //残弾が0以下ならリロード
+                    else if(this.CurrentAmmo<=0&&this.MaxAmmo){
+                        this.CurrentAmmo=this.MaxAmmo;
+                        this.reloadwait=BattleSystem.ReloadWait(this.MaxAmmo);
+                        this.mode="idle";
+                    }
                     //そうでなければ攻撃
                     else{
+                        this.CurrentAmmo--;
                         this.attackaction(this);
                         this.wait=BattleSystem.ShotWait(this.A_FireRate)
                     }

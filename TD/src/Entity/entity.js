@@ -34,6 +34,7 @@ class Entity{
         this.A_Speed=this.B_Speed;
         this.A_Critical=this.B_Critical
         this.A_CriticalDMG=this.B_CriticalDMG;
+        
 
         this.type = type;
         this.faction = faction;
@@ -49,7 +50,8 @@ class Entity{
         this.buffList=[];
         this.deathflag=false;
         this.killfaction;
-
+        this.reloadwait=0;
+        
         //DOMの生成
         this.node=document.createElement("div");
         this.node.style.backgroundColor=factionList[faction].color;

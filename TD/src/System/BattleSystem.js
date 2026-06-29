@@ -49,7 +49,7 @@ const BattleSystem={
     },
     //リロード時間を返す
     ReloadWait(MaxAmmo){
-        return Math.floor(MaxAmmo*0.5*fps);
+        return Math.floor((MaxAmmo*0.2+1)*fps);
     },
     //ダメージ計算
     Damage(bullets,this_){
