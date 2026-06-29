@@ -244,7 +244,7 @@ function selectGrid(x, y){
     }
 
     const grid = StageGridList[y][x];
-    Menu.forcas(grid);
+    // Menu.forcas(grid);
 
     //scopegridへ格納
     scopegrid.x = grid.x;

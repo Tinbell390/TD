@@ -26,12 +26,12 @@ const Menu={
         Menu.showcost.innerHTML=ScoreSystem.GameCost;
     },
     forcas(grid){
+        if(!grid)return;
         this.summonmenu.innerHTML="";
         //生成可能なアイテムのリストを表示
         //そのマスに建物があるか確認
         let buildingflag=grid.onEntity.some(e=>e.Category=="building");
         let infantryflag=!(grid.name=="司令部"||grid.name=="飛行場");
-        console.log(grid.name);
 
         if(grid.faction=="our"){
             Object.values(EntityType).forEach(e=>{
