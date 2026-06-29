@@ -47,7 +47,7 @@ const Menu={
                     const input=document.createElement("input");
                     input.type="button";
                     input.value="Summon";
-                    input.onclick=()=>{summonEntity(grid.x,grid.y,e.label,'our','Suppress')}
+                    input.onclick=()=>{summonEntity(grid.x,grid.y,e.label,'our',e.Category=="building"?"Turret":'Suppress')}
                     p.appendChild(input);
                     this.summonmenu.appendChild(p);
                 }

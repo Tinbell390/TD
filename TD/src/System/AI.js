@@ -24,7 +24,7 @@ const EntityAI={
                     //ターゲットが見つかれば終了
                     if(this.target){
                         //待機時間を与える
-                        this.wait=(this.A_FireRate/this.A_Speed)*5;
+                        this.wait=Math.floor(BattleSystem.ShotWait(this.A_FireRate)/3);
                     }
                     //ターゲットが見つからなければ射撃間隔だけ待機
                     else{
@@ -69,10 +69,6 @@ const EntityAI={
             }
             // 待機モードの処理
             else if(this.mode=="idle"){
-                //ターゲットが配列で最大数以下なら標的を探す
-                if(Array.isArray(this.target)&&this.target.length<3){
-                    this.target=this.search.call(this);
-                }
                 if(this.target){
                     // ターゲットが存在するなら攻撃状態に移行
                     this.mode="attack";
@@ -119,7 +115,7 @@ const EntityAI={
                     this.reloadwait--;
                     return ;
                 }
-                //ターゲットが配列である
+                //ターゲットが配列でない
                 if(!Array.isArray(this.target)){               
                      //相手が死亡していれば待機モードに移行
                     if(this.target.deathflag){
@@ -165,6 +161,10 @@ const EntityAI={
                     }
                     //そうでなければ攻撃
                     else{
+                        //ターゲットが配列で最大数以下なら標的を探す
+                        if(Array.isArray(this.target)&&this.target.length<3){
+                            this.target=this.search.call(this);
+                        }
                         this.CurrentAmmo--;
                         this.attackaction(this);
                         this.wait=BattleSystem.ShotWait(this.A_FireRate)
