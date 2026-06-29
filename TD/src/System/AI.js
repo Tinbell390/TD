@@ -69,6 +69,10 @@ const EntityAI={
             }
             // 待機モードの処理
             else if(this.mode=="idle"){
+                //ターゲットが配列で最大数以下なら標的を探す
+                if(Array.isArray(this.target)&&this.target.length<3){
+                    this.target=this.search.call(this);
+                }
                 if(this.target){
                     // ターゲットが存在するなら攻撃状態に移行
                     this.mode="attack";

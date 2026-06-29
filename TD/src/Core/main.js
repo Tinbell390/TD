@@ -75,11 +75,11 @@ setInterval(gameloop, 1000/fps);
 //エンティティテスト用
 
 // new Entity(22,7,"SG","our","Suppress");
-new Entity(22,7,"SG","our","Suppress");
-new Entity(20,7,"RF","our","Suppress");
+// new Entity(22,7,"SG","our","Suppress");
+// new Entity(20,7,"RF","our","Suppress");
 // new Entity(20,7,"AR","our","Suppress");
 
-new Entity(37,7,"SMG","enemy1","Suppress");
+// new Entity(37,7,"SMG","enemy1","Suppress");
 // new Entity(37,7,"SMG","enemy1","Suppress");
 // new Entity(37,7,"SW","enemy1","Suppress");
 // new Entity(37,7,"SW","enemy1","Suppress");

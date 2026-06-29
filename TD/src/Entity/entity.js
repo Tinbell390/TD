@@ -51,7 +51,7 @@ class Entity{
         this.deathflag=false;
         this.killfaction;
         this.reloadwait=0;
-        
+
         //DOMの生成
         this.node=document.createElement("div");
         this.node.style.backgroundColor=factionList[faction].color;
@@ -113,6 +113,9 @@ class Entity{
                 });
             }
         }
+        if(this.type=="HQ"&&this.faction!="our"&&this.faction!="neutral"){
+            this.summonEnemy=EnemySystem.EnemySummonHG;
+        }
     }
 
     update(){
@@ -152,6 +155,8 @@ class Entity{
         else if(damageflag)this.updateHPBar();
         //待ち時間0のhitListを削除
         this.hitList=this.hitList.filter(bullets=>bullets.wait>0);
+
+        if(this.summonEnemy)this.summonEnemy(this.grid_x,this.grid_y,this.faction);
     }
 
     //HPバーの更新
