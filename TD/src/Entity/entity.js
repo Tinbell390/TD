@@ -113,7 +113,7 @@ class Entity{
                 });
             }
         }
-        if(this.type=="HQ"&&this.faction!="our"&&this.faction!="neutral"){
+        if((this.type=="HQ"||this.type=="H"||this.type=="B")&&this.faction!="our"&&this.faction!="neutral"){
             this.summonEnemy=EnemySystem.EnemySummonHG;
         }
     }
@@ -226,6 +226,7 @@ class Entity{
         this.node.remove();
 
         //所在マスのonEntityから自分を削除
+        console.log(this)
         StageGridList[this.grid_y][this.grid_x].onEntity=StageGridList[this.grid_y][this.grid_x].onEntity.filter(e=>e!=this);
 
 
@@ -268,7 +269,7 @@ class Entity{
 }
 function summonEntity(grid_x,grid_y,type,faction,actionmode){
     if(EntityType[type].cost>ScoreSystem.GameCost){
-        console.alert("コストが足りません");
+        console.error("コストが足りません");
         return ;
     }
     else{
