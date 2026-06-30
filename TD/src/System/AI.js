@@ -289,7 +289,8 @@ const EntityAI={
 
             }
             else return null;
-        }
+        },
+        
     },
     Attack:{
         Shot(this_){//通常射撃

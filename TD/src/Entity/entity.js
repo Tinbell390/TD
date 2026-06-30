@@ -179,6 +179,10 @@ class Entity{
         }
     }
 
+    addbuff(state,rate,lifetime){
+        this.buffList.push(new buff(state,rate,lifetime));
+    }
+
     move(){//移動処理
         let dx=(this.route[0].x+0.5)*stage_grid_size;
         let dy=(this.route[0].y+0.5)*stage_grid_size;        
