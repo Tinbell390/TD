@@ -124,6 +124,6 @@ const BattleSystem={
     },
     
     BuildingDamage:3,
-    KnockbackChance:50,
+    KnockbackChance:5,
     ScatterTarget:3
 }

@@ -2,6 +2,7 @@
 
 const Menu={
     StartTime:Date.now(),
+    lastState : "",
     NowTime() {
         const elapsed = Date.now() - this.StartTime;
 
@@ -24,6 +25,7 @@ const Menu={
         Menu.showtime.innerHTML=Menu.NowTime();
         Menu.showscore.innerHTML=ScoreSystem.GameScore;
         Menu.showcost.innerHTML=ScoreSystem.GameCost;
+        Menu.updateSummonMenu();
     },
     forcas(grid){
         if(!grid)return;
@@ -47,12 +49,30 @@ const Menu={
                     const input=document.createElement("input");
                     input.type="button";
                     input.value="Summon";
-                    input.onclick=()=>{summonEntity(grid.x,grid.y,e.label,'our',e.Category=="building"?"Turret":'Suppress')}
+                    input.onclick=()=>{
+                        console.log("summon");
+                        summonEntity(grid.x,grid.y,e.label,'our',e.Category=="building"?"Turret":'Suppress')}
                     p.appendChild(input);
                     this.summonmenu.appendChild(p);
                 }
             })
         }
-    }
+        
+    },
+    updateSummonMenu() {
+        if (!selectedGrid) return;
 
+        const state = JSON.stringify({
+            x: selectedGrid.x,
+            y: selectedGrid.y,
+            faction: selectedGrid.faction,
+            name: selectedGrid.name,
+            onEntity: selectedGrid.onEntity.map(e => e.id) // または label 等
+        });
+
+        if (state !== this.lastState) {
+            this.lastState = state;
+            Menu.forcas(selectedGrid);
+        }
+    }
 }

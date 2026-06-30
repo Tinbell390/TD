@@ -135,6 +135,7 @@ const EntityAI={
                     }
                     //そうでなければ攻撃
                     else{
+                        if(this.searchmode=="RandamTarget")this.target=this.search.call(this);
                         this.CurrentAmmo--;
                         this.attackaction(this);
                         this.wait=BattleSystem.ShotWait(this.A_FireRate)
@@ -265,6 +266,29 @@ const EntityAI={
             }
 
             return null;
+        },
+        //無作為にターゲット
+        RandamTarget(){
+            let targetlist=[];
+            for(let i=this.Range;i>0;i--){
+
+                for(let d of DEST[i]){
+                    let nx=this.grid_x+d.x;
+                    let ny=this.grid_y+d.y;
+                    if(nx < 0 ||ny < 0 ||ny >= StageGridList.length ||nx >= StageGridList[0].length){
+                        continue;
+                    }
+                    let enemylist =StageGridList[ny][nx].onEntity;
+                    targetlist =targetlist.concat(enemylist.filter(entity =>entity.faction!=this.faction));
+                }
+
+            }
+            if(targetlist.length > 0){
+
+                return targetlist[Math.floor(Math.random()*targetlist.length)];
+
+            }
+            else return null;
         }
     },
     Attack:{
@@ -350,7 +374,7 @@ const EntityAI={
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
                         bulletss.classList.add("move");
-                        bulletss.style.transform =`translate(${ta.x}px, ${ta.y}px)`;
+                        bulletss.style.transform =`translate(${ta.x+Math.random()*5}px, ${ta.y+Math.random()*5}px)`;
                     });
                 });
                 //ノックバック判定と処理

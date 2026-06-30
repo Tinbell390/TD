@@ -58,7 +58,6 @@ function gameloop(){
     }
     Menu.update();
     if(gametime%10==0){
-        Menu.forcas(selectedGrid);
 
     }
     gametime++;

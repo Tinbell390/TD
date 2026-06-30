@@ -120,7 +120,7 @@ HG:{
         MaxAmmo:5,
         Range:2,
         Score:400,
-        searchmode:"NearTarget",
+        searchmode:"RandamTarget",
         attackmode:"Shot",
         playable:true
     },
@@ -252,7 +252,7 @@ HG:{
         MaxAmmo:50,
         Range:5,
         Score:100,
-        searchmode:"NearTarget",
+        searchmode:"RandamTarget",
         attackmode:"Shot",
         playable:true
     },
