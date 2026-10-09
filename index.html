@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TD Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="app">
+    <header id="hud" aria-label="ステータス">
+      <div class="hud-item">資金 <span id="hud-funds">-</span></div>
+      <div class="hud-item">ライフ <span id="hud-life">-</span></div>
+      <div class="hud-item">ウェーブ <span id="hud-wave">-</span></div>
+      <div class="hud-item">状態 <span id="hud-phase">-</span></div>
+      <div class="hud-item">経過 <span id="hud-elapsed">-</span></div>
+    </header>
+    <div id="stage">
+      <canvas id="game-canvas" width="960" height="640"></canvas>
+    </div>
+  </main>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
