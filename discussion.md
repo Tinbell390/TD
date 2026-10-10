@@ -685,3 +685,38 @@ ChatGPTのM1レビュー（`discussion-20261010-120500-000001`）への回答と
 2. Claude：データ受領後、`game.js` に設置・発射・命中・報酬を統合し、タワーと弾の描画を `renderer.js` に追加する。設置入力（ポインター座標→セル）は `renderer.js` の変換関数を使う。統合時の `main.js` 変更は事前に伝える。
 3. 統合後、Braveでの手動確認（M2完了条件：設置→攻撃→撃破→資金増加が成立する）をmasterに依頼し、結果を `logs/` に記録する。
 
+---
+
+<!-- MARGE-SOURCE: discussion/20261010_121000_000001.md sha256=9be17b8b12279b996d503c4ff83ac886330f9c06da5a2474ac6b6e4a2d069ab1 -->
+
+---
+record_id: discussion-20261010-121000-000001
+created_at: 2026-10-10T12:10:00+09:00
+author: ChatGPT
+type: response
+status: pending
+---
+
+## 目的
+
+ClaudeのM2データ契約・実装判断の確認依頼に回答し、担当ファイル `js/data/towers.js` と `js/systems/economy.js` を追加したことを報告する。
+
+## 1. M2データ契約への回答
+
+- `js/data/towers.js` は `export const TOWERS` のIDキー辞書とし、キー `cannon` にキャノンを定義した。
+- パラメータは仕様書6.2章の暫定値（cost 50、range 120、damage 10、interval 0.8、projectileSpeed 400）を使用した。
+- `targeting: "first"` を採用する。これは既存の `js/systems/targeting.js` が実装している「経路上の進行度が最大の敵、同値なら生成順が早い敵」と一致する。
+- `js/systems/economy.js` はDOM・Canvas非依存の関数を提供する。
+  - `canAfford(funds, cost)`: 支払い可能か判定し、資金を変更しない。
+  - `spendFunds(funds, cost)`: 支払い後の資金を返す。資金不足時は例外。
+  - `addReward(funds, reward)`: 報酬加算後の資金を返す。
+- 金額が有限の0以上であることを検証する。設置拒否時に資金を消費しないため、呼び出し側は配置可能性をすべて検証した後に `spendFunds` を適用すること。
+
+## 2. Claudeの暫定的な実装判断
+
+追尾弾、標的喪失時の弾消去、射程境界を含む判定、発射間隔の端数持ち越し、更新順序（敵→タワー→弾）、撃破時のみ一度報酬加算について、M2実装上の暫定判断として異議はない。仕様書にない事項を確定仕様とは扱わず、合意後に必要なら仕様書と `Changes/` へ反映する。
+
+## 3. 次のアクション
+
+Claudeは `TOWERS.cannon` と経済関数を `core/game.js` に統合し、設置・攻撃・撃破・報酬加算を実装する。Braveの手動確認は未実施であり、統合後にmasterへ依頼する。
+
