@@ -1,8 +1,12 @@
-// ゲーム状態管理とメインループ（specification.md 2章・5章）。
+// ゲーム状態管理とメインループ（specification.md 2章・5章・8章）。
 import { STAGES } from "../data/stages.js";
 import { ENEMIES } from "../data/enemies.js";
-import { buildPath, pathCells, validateWaypoints } from "../systems/pathing.js";
+import { TOWERS } from "../data/towers.js";
+import { buildPath, pathCells, validateWaypoints, cellKey } from "../systems/pathing.js";
+import { canAfford, spendFunds, addReward } from "../systems/economy.js";
 import { createEnemy, updateEnemy, resetEnemyIds } from "../entities/enemy.js";
+import { createTower, updateTower, resetTowerIds } from "../entities/tower.js";
+import { updateProjectile, resetProjectileIds } from "../entities/projectile.js";
 
 export const LOGICAL_WIDTH = 960;
 export const LOGICAL_HEIGHT = 640;
@@ -49,6 +53,8 @@ export function createInitialState(stage, runtime) {
     path: runtime.path,
     pathCells: runtime.pathCells,
     enemies: [],
+    towers: [],
+    projectiles: [],
   };
 }
 
@@ -62,6 +68,8 @@ export class Game {
     this.stage = stage;
     this.runtime = prepareStage(stage);
     resetEnemyIds();
+    resetTowerIds();
+    resetProjectileIds();
     this.state = createInitialState(stage, this.runtime);
     // M1確認用の暫定スポナー。M3でwaves.jsに置き換えて削除する。
     this.demo = null;
@@ -101,6 +109,31 @@ export class Game {
     this.state.enemies.push(createEnemy(def, hpMultiplier, this.runtime.path));
   }
 
+  /**
+   * セル (col, row) にタワーを設置する（8章）。拒否時は状態を一切変更しない（資金も消費しない）。
+   * 拒否理由：phase（一時停止・クリア・ゲームオーバー中）/ out-of-bounds / path / occupied / funds
+   * @returns {{ ok: true, tower: object } | { ok: false, reason: string }}
+   */
+  placeTower(defId, col, row) {
+    const def = TOWERS[defId];
+    if (!def) throw new Error(`未定義のタワーです: ${defId}`);
+    const state = this.state;
+    if (state.phase === PHASE.PAUSED || state.phase === PHASE.CLEARED || state.phase === PHASE.GAME_OVER) {
+      return { ok: false, reason: "phase" };
+    }
+    if (!Number.isInteger(col) || !Number.isInteger(row) || col < 0 || col >= COLS || row < 0 || row >= ROWS) {
+      return { ok: false, reason: "out-of-bounds" };
+    }
+    if (this.runtime.pathCells.has(cellKey(col, row))) return { ok: false, reason: "path" };
+    if (state.towers.some((t) => t.col === col && t.row === row)) return { ok: false, reason: "occupied" };
+    if (!canAfford(state.funds, def.cost)) return { ok: false, reason: "funds" };
+    // すべての拒否条件を通過した後にのみ支払う。
+    state.funds = spendFunds(state.funds, def.cost);
+    const tower = createTower(def, col, row, CELL_SIZE);
+    state.towers.push(tower);
+    return { ok: true, tower };
+  }
+
   frame(now) {
     if (this.lastTime === null) this.lastTime = now;
     let delta = (now - this.lastTime) / 1000;
@@ -119,6 +152,7 @@ export class Game {
     this.rafId = requestAnimationFrame(this.frame);
   }
 
+  // 1ステップの更新順序：敵の移動 → タワー（発射） → 弾（移動・命中）。
   update(dt) {
     const state = this.state;
     const { phase } = state;
@@ -128,6 +162,8 @@ export class Game {
     state.elapsed += dt;
     this.updateDemoSpawner(dt);
     this.updateEnemies(dt);
+    this.updateTowers(dt);
+    this.updateProjectiles(dt);
   }
 
   updateDemoSpawner(dt) {
@@ -151,6 +187,27 @@ export class Game {
         state.life = Math.max(0, state.life - enemy.lifeDamage);
       }
     }
+    state.enemies = state.enemies.filter((e) => e.alive && !e.reachedGoal);
+  }
+
+  updateTowers(dt) {
+    const state = this.state;
+    for (const tower of state.towers) {
+      const projectile = updateTower(tower, dt, state.enemies);
+      if (projectile) state.projectiles.push(projectile);
+    }
+  }
+
+  updateProjectiles(dt) {
+    const state = this.state;
+    for (const p of state.projectiles) {
+      const result = updateProjectile(p, dt);
+      // 撃破報酬は、撃破した命中時に1回だけ加算する（damageEnemy は撃破済みの敵に対して false を返す）。
+      if (result.type === "hit" && result.killed) {
+        state.funds = addReward(state.funds, result.enemy.reward);
+      }
+    }
+    state.projectiles = state.projectiles.filter((p) => p.alive);
     state.enemies = state.enemies.filter((e) => e.alive && !e.reachedGoal);
   }
 }

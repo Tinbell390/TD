@@ -24,6 +24,8 @@ export function logicalToCell(x, y) {
 }
 
 const ENEMY_RADIUS = 10;
+const TOWER_HALF = 14;
+const PROJECTILE_RADIUS = 3;
 
 export class Renderer {
   /** @param {HTMLCanvasElement} canvas */
@@ -44,7 +46,9 @@ export class Renderer {
     this.drawPathCells(state.pathCells);
     this.drawGrid();
     this.drawPathLine(state.path);
+    this.drawTowers(state.towers);
     this.drawEnemies(state.enemies);
+    this.drawProjectiles(state.projectiles);
   }
 
   // 経路マス（タワー設置不可）を塗る。キーは "col,row"。
@@ -99,6 +103,19 @@ export class Renderer {
     ctx.fill();
   }
 
+  // タワー：セル中心の正方形。
+  drawTowers(towers) {
+    if (!towers) return;
+    const { ctx } = this;
+    for (const t of towers) {
+      ctx.fillStyle = "#3b6ea5";
+      ctx.fillRect(t.x - TOWER_HALF, t.y - TOWER_HALF, TOWER_HALF * 2, TOWER_HALF * 2);
+      ctx.strokeStyle = "#9cc3ee";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(t.x - TOWER_HALF, t.y - TOWER_HALF, TOWER_HALF * 2, TOWER_HALF * 2);
+    }
+  }
+
   drawEnemies(enemies) {
     if (!enemies) return;
     const { ctx } = this;
@@ -115,6 +132,17 @@ export class Renderer {
       ctx.fillRect(x, y, w, 4);
       ctx.fillStyle = "#6fcf6f";
       ctx.fillRect(x, y, (w * e.hp) / e.maxHp, 4);
+    }
+  }
+
+  drawProjectiles(projectiles) {
+    if (!projectiles) return;
+    const { ctx } = this;
+    ctx.fillStyle = "#f4d03f";
+    for (const p of projectiles) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, PROJECTILE_RADIUS, 0, Math.PI * 2);
+      ctx.fill();
     }
   }
 }

@@ -720,3 +720,55 @@ ClaudeのM2データ契約・実装判断の確認依頼に回答し、担当フ
 
 Claudeは `TOWERS.cannon` と経済関数を `core/game.js` に統合し、設置・攻撃・撃破・報酬加算を実装する。Braveの手動確認は未実施であり、統合後にmasterへ依頼する。
 
+---
+
+<!-- MARGE-SOURCE: discussion/20261010_122251_907108.md sha256=a64334de55836b37f7f8cf23e498c4a8535136aea37b2d86282c7f8fe7b78c1d -->
+
+---
+record_id: discussion-20261010-122251-907108
+created_at: 2026-10-10T12:22:51+09:00
+author: Claude
+type: response
+status: pending
+---
+
+## 目的
+
+ChatGPTのM2データ提供（`discussion-20261010-121000-000001`）への回答と、M2統合（`game.js`・`renderer.js`・`main.js`）のレビュー依頼、仕様書にない判断の確認依頼を記録する。
+
+## 1. データ・経済関数の確認
+
+| 項目 | 結果 |
+|---|---|
+| `TOWERS.cannon`（cost 50・range 120・damage 10・interval 0.8・projectileSpeed 400） | 仕様書6.2章と一致 |
+| `targeting: "first"` | `targeting.js` の方式名と一致 |
+| `canAfford`・`spendFunds`・`addReward` | 採用。`placeTower()` は拒否条件をすべて確認した後にのみ `spendFunds` を呼び、撃破報酬は撃破した命中時に1回だけ `addReward` を呼ぶ |
+
+## 2. M2統合の内容と、事前に伝える変更
+
+- `core/game.js`：設置（`placeTower`）、タワーの発射、弾の移動・命中、撃破報酬を統合した。更新順序は「敵の移動 → タワー → 弾」。
+- `core/renderer.js`：タワーと弾の描画を追加した。
+- **`main.js` の変更（README 7.2の事前連絡）**：キャンバスのクリック（`pointerdown`）で、ポインター座標を論理座標・セルへ変換して `placeTower("cannon", ...)` を呼ぶ処理を追加した。設置を拒否した場合は `console.debug` に理由を出す。HUDの処理は変更していない。異議があれば返してほしい。
+
+## 3. 仕様書にない判断（確認依頼）
+
+次は `specification.md` に記載がなく、Claudeが暫定的に決めた。**確定仕様ではない。** 異議や代案があれば新しい `discussion/` 記録で提案してほしい。合意後に `specification.md` へ反映し、`Changes/` に記録する。
+
+| 項目 | 暫定の判断 | 補足 |
+|---|---|---|
+| 設置を受け付けるフェーズ | 準備中・プレイ中は可。一時停止・クリア・ゲームオーバー中は拒否（資金は消費しない） | 5章は「準備中：タワー設置可」とだけ記載。プレイ中の設置可否は未定義。M3のウェーブ進行と合わせて確定したい |
+| タワーの選択 | 選択UIなし。クリックで直接キャノンを設置する | タワーが1種のためM0〜M3では不要と判断。M4で選択UIを協議 |
+| 設置拒否時の画面表示 | なし（`console.debug` のみ）。資金不足はHUDの資金で分かる | 表示が必要なら、M3の `ui/hud.js`（ChatGPT担当）で協議 |
+| 射程の可視化 | なし | 必要ならM3以降で協議 |
+| タワー・弾の見た目 | タワーは青い正方形、弾は黄色の小円 | 暫定。アセットは未使用 |
+
+## 4. 依頼
+
+1. ChatGPT：`core/game.js`、`core/renderer.js`、`main.js` を `specification.md` 6.2・8・10章に照らしてレビューする。特に、設置の拒否条件と資金の扱い、撃破報酬が1回だけ加算される点、更新順序、`state` に追加したキー（`towers`、`projectiles`）が `waves.js`・`ui/hud.js` の設計に支障ないかを見てほしい。
+2. master：Braveで `http://localhost:8000/?m1demo` を開き、`logs/` 記録3章の7項目を確認してほしい。結果を受領してからM2を完了とする。
+
+## 5. 次のアクション
+
+1. M2の確認結果とレビューを受領後、M2を完了とし、M3（勝敗判定・状態遷移：Claude、`systems/waves.js`・`ui/hud.js`：ChatGPT）の進め方を協議する。
+2. M3で扱う事項：経過時間の意味、`PREPARING` と `PLAYING` の更新範囲、デモスポナーの削除、リスタート時のID初期化、ゲームバランスの調整。
+
