@@ -1,9 +1,10 @@
-// ゲーム状態管理とメインループ（specification.md 2章・5章・8章）。
+// ゲーム状態管理とメインループ（specification.md 2章・5章・7章・8章・9章）。
 import { STAGES } from "../data/stages.js";
 import { ENEMIES } from "../data/enemies.js";
 import { TOWERS } from "../data/towers.js";
 import { buildPath, pathCells, validateWaypoints, cellKey } from "../systems/pathing.js";
 import { canAfford, spendFunds, addReward } from "../systems/economy.js";
+import { createSpawner, advanceSpawner, pendingCount, isSpawnerDone } from "../systems/waves.js";
 import { createEnemy, updateEnemy, resetEnemyIds } from "../entities/enemy.js";
 import { createTower, updateTower, resetTowerIds } from "../entities/tower.js";
 import { updateProjectile, resetProjectileIds } from "../entities/projectile.js";
@@ -16,6 +17,9 @@ export const ROWS = LOGICAL_HEIGHT / CELL_SIZE; // 16
 
 export const STEP = 1 / 60; // 固定更新ステップ（秒）
 export const MAX_FRAME_DELTA = 0.25; // 1フレームの経過時間の上限（秒）
+
+// 7章：初期版は全ウェーブの敵がザコのみ。ウェーブ定義に敵IDがないため、ここで固定する。
+const WAVE_ENEMY_ID = "zako";
 
 export const PHASE = Object.freeze({
   PREPARING: "preparing",
@@ -47,9 +51,13 @@ export function createInitialState(stage, runtime) {
     phase: PHASE.PREPARING,
     funds: stage.startFunds,
     life: stage.startLife,
-    wave: 0,
+    wave: 0, // 開始済みの最新ウェーブ番号（未開始は0）
+    nextWave: stage.waves.length > 0 ? 1 : null, // 次に開始するウェーブ番号（残りがなければnull）
     totalWaves: stage.waves.length,
-    elapsed: 0, // 経過時間の意味はM3で協議（準備中も加算される現状）。
+    canStartWave: stage.waves.length > 0, // 7章の有効条件をGameが判定した結果
+    pendingSpawns: 0, // 現在のウェーブの出現待ち敵数
+    resumePhase: null, // 一時停止中のみ、再開後に戻る状態（preparing / playing）
+    elapsed: 0, // プレイ中の累積ゲーム時間（5.2章）
     path: runtime.path,
     pathCells: runtime.pathCells,
     enemies: [],
@@ -67,16 +75,22 @@ export class Game {
     this.onFrame = onFrame;
     this.stage = stage;
     this.runtime = prepareStage(stage);
-    resetEnemyIds();
-    resetTowerIds();
-    resetProjectileIds();
-    this.state = createInitialState(stage, this.runtime);
-    // M1確認用の暫定スポナー。M3でwaves.jsに置き換えて削除する。
-    this.demo = null;
     this.lastTime = null;
     this.accumulator = 0;
     this.rafId = null;
     this.frame = this.frame.bind(this);
+    this.resetGame();
+  }
+
+  // 初期状態を作る（コンストラクタとリスタートで共用。9章）。
+  resetGame() {
+    resetEnemyIds();
+    resetTowerIds();
+    resetProjectileIds();
+    this.state = createInitialState(this.stage, this.runtime);
+    this.waveIndex = 0; // 開始済みのウェーブ数
+    this.spawner = null; // 現在のウェーブの出現器
+    this.resetClock();
   }
 
   start() {
@@ -97,10 +111,51 @@ export class Game {
     this.accumulator = 0;
   }
 
-  /** M1確認用：ウェーブ1相当の敵を一定間隔で出現させる（ゲーム内時間基準）。 */
-  enableM1Demo() {
-    const wave = this.stage.waves[0];
-    this.demo = { remaining: wave.count, interval: wave.interval, hpMultiplier: wave.hpMultiplier, timer: 0 };
+  /**
+   * 次のウェーブを開始する（7章）。
+   * @returns {{ ok: true } | { ok: false, reason: "phase" | "enemies-remain" | "no-more-waves" }}
+   */
+  startNextWave() {
+    const state = this.state;
+    if (state.phase !== PHASE.PREPARING) return { ok: false, reason: "phase" };
+    if (state.enemies.length > 0) return { ok: false, reason: "enemies-remain" };
+    if (this.waveIndex >= this.stage.waves.length) return { ok: false, reason: "no-more-waves" };
+    this.spawner = createSpawner(this.stage.waves[this.waveIndex]);
+    this.waveIndex++;
+    state.phase = PHASE.PLAYING;
+    this.refreshDerived();
+    return { ok: true };
+  }
+
+  /** 準備中・プレイ中なら一時停止、一時停止中なら元の状態へ再開する。クリア・ゲームオーバー中は何もしない（9章）。 */
+  togglePause() {
+    const state = this.state;
+    if (state.phase === PHASE.PREPARING || state.phase === PHASE.PLAYING) {
+      state.resumePhase = state.phase;
+      state.phase = PHASE.PAUSED;
+    } else if (state.phase === PHASE.PAUSED) {
+      state.phase = state.resumePhase ?? PHASE.PREPARING;
+      state.resumePhase = null;
+      this.resetClock(); // 停止中の経過時間を反映させない（2章）
+    }
+    this.refreshDerived();
+  }
+
+  /** 初期状態（準備中）へ戻す（9章）。 */
+  restart() {
+    this.resetGame();
+    this.refreshDerived();
+  }
+
+  // state の派生キー（HUD用）を更新する。HUDは読み取りのみ。
+  refreshDerived() {
+    const state = this.state;
+    const total = this.stage.waves.length;
+    state.wave = this.waveIndex;
+    state.nextWave = this.waveIndex < total ? this.waveIndex + 1 : null;
+    state.canStartWave =
+      state.phase === PHASE.PREPARING && state.enemies.length === 0 && this.waveIndex < total;
+    state.pendingSpawns = this.spawner ? pendingCount(this.spawner) : 0;
   }
 
   spawnEnemy(defId, hpMultiplier) {
@@ -152,30 +207,24 @@ export class Game {
     this.rafId = requestAnimationFrame(this.frame);
   }
 
-  // 1ステップの更新順序：敵の移動 → タワー（発射） → 弾（移動・命中）。
+  // 1ステップの更新順序：出現 → 敵の移動 → タワー（発射） → 弾（移動・命中） → 状態遷移。
+  // ゲーム内時間は「プレイ中」のみ進める（5章）。
   update(dt) {
     const state = this.state;
-    const { phase } = state;
-    if (phase === PHASE.PAUSED || phase === PHASE.CLEARED || phase === PHASE.GAME_OVER) {
-      return;
-    }
+    if (state.phase !== PHASE.PLAYING) return;
     state.elapsed += dt;
-    this.updateDemoSpawner(dt);
+    this.updateSpawner(dt);
     this.updateEnemies(dt);
     this.updateTowers(dt);
     this.updateProjectiles(dt);
+    this.checkTransitions();
+    this.refreshDerived();
   }
 
-  updateDemoSpawner(dt) {
-    const d = this.demo;
-    if (!d || d.remaining <= 0) return;
-    d.timer -= dt;
-    // 1ステップで複数回の出現条件を満たしても取りこぼさない。
-    while (d.remaining > 0 && d.timer <= 0) {
-      this.spawnEnemy("zako", d.hpMultiplier);
-      d.remaining--;
-      d.timer += d.interval;
-    }
+  updateSpawner(dt) {
+    if (!this.spawner) return;
+    const count = advanceSpawner(this.spawner, dt);
+    for (let i = 0; i < count; i++) this.spawnEnemy(WAVE_ENEMY_ID, this.spawner.hpMultiplier);
   }
 
   updateEnemies(dt) {
@@ -183,7 +232,6 @@ export class Game {
     for (const enemy of state.enemies) {
       updateEnemy(enemy, dt, this.runtime.path);
       if (enemy.reachedGoal) {
-        // ライフは0未満にしない。ゲームオーバー遷移はM3（9章・5章）で実装する。
         state.life = Math.max(0, state.life - enemy.lifeDamage);
       }
     }
@@ -209,5 +257,23 @@ export class Game {
     }
     state.projectiles = state.projectiles.filter((p) => p.alive);
     state.enemies = state.enemies.filter((e) => e.alive && !e.reachedGoal);
+  }
+
+  // 5.1章：ゲームオーバー（ライフ0以下）を優先し、次にウェーブ完了・クリアを判定する。
+  checkTransitions() {
+    const state = this.state;
+    if (state.life <= 0) {
+      state.phase = PHASE.GAME_OVER;
+      return;
+    }
+    const waveFinished = this.spawner !== null && isSpawnerDone(this.spawner) && state.enemies.length === 0;
+    if (!waveFinished) return;
+    this.spawner = null;
+    if (this.waveIndex < this.stage.waves.length) {
+      state.phase = PHASE.PREPARING;
+      state.projectiles = []; // 標的が全滅しているため、飛行中の弾をすべて消す
+    } else {
+      state.phase = PHASE.CLEARED;
+    }
   }
 }

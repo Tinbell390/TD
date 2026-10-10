@@ -50,7 +50,42 @@ body {
   font-weight: 600;
 }
 
-/* 論理サイズ960x640（3:2）の縦横比を維持してウィンドウに収める */
+.hud-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.hud-controls button {
+  padding: 4px 12px;
+  border: 1px solid #3a4658;
+  border-radius: 4px;
+  background: #263040;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.hud-controls button:hover:not(:disabled) {
+  background: #2f3b4f;
+}
+
+.hud-controls button:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+#hud-message {
+  font-weight: 700;
+  color: #f4d03f;
+}
+
+#hud-message:empty {
+  display: none;
+}
+
+/* 論理サイズ960x640（3:2）の縦横比を維持してウィンドウに収める。
+   HUDの高さが折り返しで変わっても収まるよう、対応環境では #stage の実寸を基準にする。 */
 #stage {
   flex: 1;
   display: flex;
@@ -67,4 +102,14 @@ body {
   aspect-ratio: 3 / 2;
   height: auto;
   background: #000;
+}
+
+@supports (width: 1cqw) {
+  #stage {
+    container-type: size;
+  }
+
+  #game-canvas {
+    width: min(100cqw, 150cqh);
+  }
 }

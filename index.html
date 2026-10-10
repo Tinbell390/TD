@@ -14,6 +14,12 @@
       <div class="hud-item">ウェーブ <span id="hud-wave">-</span></div>
       <div class="hud-item">状態 <span id="hud-phase">-</span></div>
       <div class="hud-item">経過 <span id="hud-elapsed">-</span></div>
+      <div class="hud-controls">
+        <button id="btn-next-wave" type="button">次のウェーブ開始</button>
+        <button id="btn-pause" type="button">一時停止</button>
+        <button id="btn-restart" type="button">リスタート</button>
+      </div>
+      <div id="hud-message" role="status" aria-live="polite"></div>
     </header>
     <div id="stage">
       <canvas id="game-canvas" width="960" height="640"></canvas>
