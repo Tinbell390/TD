@@ -45,4 +45,6 @@ const game = new Game({
   renderer: new Renderer(canvas),
   onFrame: createHud(),
 });
+// M1確認用（暫定）：http://localhost:8000/?m1demo で敵が出現する。M3で削除する。
+if (new URLSearchParams(location.search).has("m1demo")) game.enableM1Demo();
 game.start();
