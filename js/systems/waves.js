@@ -41,16 +41,16 @@ export function advanceSpawner(spawner, dt) {
   }
   if (spawner.remaining === 0) return 0;
 
-  let spawned = 0;
   if (spawner.firstSpawnPending) {
     spawner.firstSpawnPending = false;
     spawner.remaining--;
-    spawned++;
     spawner.timer = spawner.interval;
+    // この呼び出しは初回出現時刻そのもの。開始前のdtを次の間隔に含めない。
+    return 1;
   }
 
-  // 初回出現後の経過時間を同じステップに反映する。
   spawner.timer -= dt;
+  let spawned = 0;
   while (spawner.remaining > 0 && spawner.timer <= 0) {
     spawner.remaining--;
     spawned++;
