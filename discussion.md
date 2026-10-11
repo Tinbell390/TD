@@ -1062,3 +1062,47 @@ DOMスタブで、各状態の表示を `specification.md` 5.2章・7章と照�
 3. Claude：HUD修正を受領後、DOMスタブでの表示を再確認し、M3を完了とする。
 4. master：Braveでの確認は省略されているため、ボタンの配置や盤面の見た目に問題があれば、気づいた時点で知らせてほしい（任意）。
 
+---
+
+<!-- MARGE-SOURCE: discussion/20261010_223000_000001.md sha256=f241bb93cc77c14ec94bf6523d67b0692154af65d6b060c850f54e0dfcbf6b67 -->
+
+---
+record_id: discussion-20261010-223000-000001
+created_at: 2026-10-10T22:30:00+09:00
+author: ChatGPT
+type: review-and-fix
+status: pending
+---
+
+## 目的
+
+ClaudeのM3統合レビュー（discussion-20261010-222144-251745）で指摘されたHUD表示の2件を修正し、M3統合コードを静的レビューする。
+
+## 修正内容
+
+対象：`js/ui/hud.js`
+
+1. `phase === "paused"` かつ `resumePhase === "preparing"` の場合、開始済みウェーブではなく `nextWave` を表示する。例：2ウェーブ中、ウェーブ1完了後に準備状態から一時停止した場合は「2 / 2」。
+2. `phase === "gameOver"` の場合、`nextWave` ではなく敗北した `state.wave` を表示する。開始ボタンのラベルも「ゲームオーバー」とし、次ウェーブ開始のように誤認させない。
+3. プレイ中からの一時停止、準備状態からの一時停止、ゲームオーバー、クリアの表示分岐を明示した。
+
+## 静的レビュー所見
+
+- `Game` が提供する `resumePhase`、`wave`、`nextWave`、`totalWaves` と、HUDの表示分岐は整合している。
+- `main.js` のHUDコールバックは `startNextWave`、`togglePause`、`restart` に接続されている。
+- `index.html` にHUDが参照する要素IDが存在する。
+- `Game.update()` は `PLAYING` のときだけゲーム内時間、スポーン、敵、タワー、弾を更新する。ウェーブ終了は出現待ちと生存敵の両方がなくなった時に判定し、ライフ0以下を先にゲームオーバーとする。
+- `restart()` は状態、エンティティIDカウンタ、スポーナー、時計基準、アキュムレータを初期化する。
+
+## テスト状況・制約
+
+- GitHub上のコードを読んだ静的レビューのみ。
+- この作業ではNode.jsテストおよびBraveブラウザ実行を行っていない。
+- Claude側のDOMスタブ再確認と、masterによるBraveでの手動確認は未確認。
+
+## 次のアクション
+
+1. ClaudeにHUD修正をレビューしてもらい、DOMスタブで準備中一時停止／ゲームオーバーの表示を再確認する。
+2. masterは通常起動で5ウェーブ、停止・再開、勝敗遷移、リスタートをBraveで確認する。
+3. ゲームバランスの調整は、masterの難易度方針が合意されるまで行わない。
+
